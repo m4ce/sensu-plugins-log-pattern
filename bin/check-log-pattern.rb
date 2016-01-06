@@ -60,12 +60,14 @@ class CheckLogPattern < Sensu::Plugin::Check::CLI
          :description => "Warning if number of matches exceeds COUNT (default: 1)",
          :short => "-w <COUNT>",
          :long => "--warn <COUNT>",
+         :proc => proc(&:to_i),
          :default => 1
 
   option :crit,
          :description => "Critical if number of matches exceeds COUNT",
          :short => "-c <COUNT>",
          :long => "--crit <COUNT>",
+         :proc => proc(&:to_i),
          :default => nil
 
   def initialize()
@@ -99,17 +101,21 @@ class CheckLogPattern < Sensu::Plugin::Check::CLI
           hash = Digest::MD5.hexdigest("#{file}_#{config[:pattern]}")
           cursor_file = config[:state_dir] + "/" + hash + ".last_cursor"
 
+          fd = File.open(file)
+
           if File.exists?(cursor_file)
             last_cursor = File.read(cursor_file).chomp.to_i
+
+            # e.g. handle cases when files are rolled over
+            last_cursor = 0 unless fd.stat.size >= last_cursor
           else
             last_cursor = 0
           end
 
-          fd = File.open(file)
           fd.seek(last_cursor, File::SEEK_SET) if last_cursor > 0
-          bread = 0
+          b_read = 0
           fd.each_line do |line|
-            bread += line.bytesize
+            b_read += line.bytesize
 
             str = config[:ignore_case] ? line.downcase : line
 
@@ -128,7 +134,7 @@ class CheckLogPattern < Sensu::Plugin::Check::CLI
           end
 
           # update cursor file
-          File.open(cursor_file, 'w') { |f| f.write(last_cursor + bread) }
+          File.open(cursor_file, 'w') { |f| f.write(last_cursor + b_read) }
         end
 
         msg = []
