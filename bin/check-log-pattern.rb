@@ -65,7 +65,7 @@ class CheckLogPattern < Sensu::Plugin::Check::CLI
   option :crit,
          :description => "Critical if number of matches exceeds COUNT",
          :short => "-c <COUNT>",
-         :long => "--critical <COUNT>",
+         :long => "--crit <COUNT>",
          :default => nil
 
   def initialize()
