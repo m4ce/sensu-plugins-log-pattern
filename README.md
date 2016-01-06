@@ -8,7 +8,7 @@ The plugin accepts the following command line options:
 
 ```
 Usage: check-log-pattern.rb (options)
-    -c, --critical <COUNT>           Critical if number of matches exceeds COUNT
+    -c, --crit <COUNT>               Critical if number of matches exceeds COUNT
     -f, --file <PATH>                Comma separated list of files (including globs) where pattern will be searched
         --ignore-case                Ignore case sensitive
     -i, --ignore-pattern <PATTERN>   Comma separated list of patterns to ignore
